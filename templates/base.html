@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <title>CharmerJS</title>
+    {% assets "css_common" %}
+        <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+    {% endassets %}
+    {%  assets "js_common" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {%  assets "js_charmer" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% block body %}{% endblock %}
+</body>
+</html>
