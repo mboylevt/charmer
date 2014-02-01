@@ -1,5 +1,5 @@
 
-// Tealight example using polyhedra reflection
+// Tealight reflection using polyhedra reflection
 //
 // author Vladimir Bulatov
 // author Alan Hudson

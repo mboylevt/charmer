@@ -4,10 +4,10 @@ import MySQLdb
 import os
 from flask import Flask, render_template
 from flask.ext.assets import Environment, Bundle
-from example import example
+from reflection import reflection
 
 app = Flask(__name__)
-app.register_blueprint(example)
+app.register_blueprint(reflection)
 
 app.config.update(dict(
     # ASSETS_DEBUG=True
