@@ -40,10 +40,6 @@ function getShapeJsPreview(code, formName, successCallback, generate2dRender, en
         }
     }
 
-    /**
-     * To get around cross domain issues, we need to proxy the request to
-     * the actual ShapeJS server
-     */
     options = {
         url: endPoint || "http://www.shapeways.com/creator/exec_pipeline_proxy",
         type: 'post',

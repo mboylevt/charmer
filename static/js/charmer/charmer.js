@@ -115,16 +115,22 @@ function getRimBottom(loc,hole,radius,thickness) {
 
 function main(args){
 
-    var radius = 5.5*MM;
-    var thickness = 1.1*MM;
+//    var radius = 5.5*MM;
+//    var thickness = 1.1*MM;
+//    var voxelSize = 0.05*MM;
+//    var holeRadius = 2.2*MM;  // a bit larger then a typical 1.5" / 38.1mm tea light
+//    var rimThickness = 1.0*MM;
+
+    var radius = args[1]*MM;
+    var thickness = args[0]*MM;
     var voxelSize = 0.05*MM;
     var holeRadius = 2.2*MM;  // a bit larger then a typical 1.5" / 38.1mm tea light
-    var rimThickness = 1.0*MM;
+    var rimThickness = MM;
 
     var a = radius + 2*thickness;
 
-    var path = args[0];
-    var image = getImage(radius,thickness, path,voxelSize);
+    var imagePath = args[2];
+    var image = getImage(radius, thickness, imagePath ,voxelSize);
 
     var reflectedImage = new Union();
 
@@ -142,11 +148,11 @@ function main(args){
     var rimTop = getRim(locTop,holeRadius,radius,rimThickness);
     var rimBottom = getRimBottom(locBottom,holeRadius,radius,rimThickness);
 
-    var tealight = new Union(subtractTop, rimTop);
-    tealight.add(rimBottom);
+    var charm = new Union(subtractTop, rimTop);
+    charm.add(rimBottom);
     var maker = new GridMaker();
 
-    maker.setSource(tealight);
+    maker.setSource(charm);
     //	maker.setSource(new Union(rimTop,rimBottom));
 
     var dest = createGrid(-a,a,-a,a,-a,a,voxelSize);
