@@ -113,7 +113,7 @@ function getRimBottom(loc,hole,radius,thickness) {
 }
 
 
-function main(arg){
+function main(args){
 
     var radius = 5.5*MM;
     var thickness = 1.1*MM;
@@ -123,7 +123,7 @@ function main(arg){
 
     var a = radius + 2*thickness;
 
-    var path = arg[0];
+    var path = args[0];
     var image = getImage(radius,thickness, path,voxelSize);
 
     var reflectedImage = new Union();

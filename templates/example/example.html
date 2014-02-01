@@ -1,0 +1,62 @@
+{% extends "main_view.html" %}
+{% block body %}
+<h1>CharmerJS</h1>
+<div>
+  <div id="shapejs-script-intput" class="container" style="float:left">
+      <span>ShapeJS scripts go here</span><br/>
+      <textarea id="shapejs-script" style="width:400px;height:300px">
+        var voxelSize = 0.1*MM;
+
+        // controls the level of decimation.  The higher this is, the more decimation is used.
+        meshErrorFactor=1;
+
+        function makePart(path, width, height, thickness){
+
+            var img = new ImageBitmap(path, width, height, thickness);
+            img.setBaseThickness(0.0);
+            img.setVoxelSize(voxelSize);
+            img.setBlurWidth(2*voxelSize);
+            img.setImagePlace(ImageBitmap.IMAGE_PLACE_TOP);
+
+            return img;
+        }
+
+        function main(args) {
+            var image = args[3];
+
+            var th = args[0]*MM;
+            var height = args[1]*MM;
+            var width = args[2]*MM;
+
+            var xGrid = width/2;
+            var yGrid = height/2;
+            dest = createGrid(-xGrid,xGrid,-yGrid,yGrid,0,th ,voxelSize);
+
+            var img = makePart(image, width, height, th);
+            var maker = new GridMaker();
+            maker.setSource(img);
+
+            maker.makeGrid(dest);
+            return dest;
+        }
+
+      </textarea>
+  </div>
+  <form id="shapejs-demo-form">
+    <input type="file" name="file1"><br>
+    <label for="param1">Thickness:</label>
+      <input id="param1" name="param1" type="text" value="3"><br>
+    <label for="param2">Length:</label>
+      <input id="param2" name="param2" type="text" value="40"><br>
+    <label for="param3">Width:</label>
+      <input id="param3" name="param3" type="text" value="20"><br>
+  </form>
+  <button onclick="getShapeJsPreview(JSON.stringify($('#shapejs-script').val()), 'shapejs-demo-form', onGenerateModelSuccess)">Generate Model</button>
+  <button onclick="uploadModel()">Upload Model</button><br>
+  <div id="model-link" style="display:none">
+  </div>
+  <div id="x3delement" style="float:left; border: 1px solid;">
+    <iframe id="x3d-iframe" x="0px" y="0px" width="500px" height="300px" frameborder="0" style="overflow:hidden" src=""></iframe>
+  </div>
+</div>
+{% endblock %}

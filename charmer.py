@@ -4,11 +4,13 @@ import MySQLdb
 import os
 from flask import Flask, render_template
 from flask.ext.assets import Environment, Bundle
+from example import example
 
 app = Flask(__name__)
+app.register_blueprint(example)
 
 app.config.update(dict(
-    ASSETS_DEBUG=True
+    # ASSETS_DEBUG=True
 ))
 
 env = Environment(app)
@@ -24,9 +26,11 @@ env.register('js_charmer', js_charmer)
 css_common = Bundle('css/style.css', output='gen/common.css')
 env.register('css_common', css_common)
 
+
+
 @app.route('/')
 def main_template():
-    return render_template('main_view.html', widgets=[])
+    return render_template('selector/selector.html', widgets=[])
 
 if __name__ == '__main__':
     app.run(debug=True, port=5051)
