@@ -16,14 +16,16 @@ function onGenerateModelSuccess(aoptOutput, modelFilePath) {
  * Uploads a model with the Shapeways API.
  */
 function uploadModel() {
+    console.log("They clicked upload");
     $.post('/upload',{
         modelFilePath: modelPath, modelFileName: "ShapeJSDemoModel.x3db"
     }, function(response) {
         // now that we have a model id, we can create a link to the model on shapeways
         var decodedResponse = JSON.parse(response);
         var modelId = decodedResponse.modelId;
+        var modelName = decodedResponse.title;
         var modelLink = $('#model-link');
-        modelLink.html('<a href="https://www.shapeways.com/model/upload-and-buy/' + modelId + '" target="_blank">Click here to see your model on shapeways.com!</a>');
+        modelLink.html('<a href="https://www.shapeways.com/model/upload-and-buy/' + modelId + '" target="_blank">Check out ' + modelName + ' on shapeways.com!</a>');
         modelLink.css('display', 'block');
     });
 }

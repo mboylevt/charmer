@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
+import base64
+import json
 
-from flask import redirect, request, Blueprint
+from flask import redirect, request, Blueprint, render_template
+from urllib2 import urlopen
+import requests
 from shapeways.client import Client
+from uuid import uuid4
 
-shapeways_api = Blueprint('shapeways_api', __name__)
+shapeways_api = Blueprint('shapeways_api', __name__, template_folder='templates')
 
 # Shapeways API client and constants
 client = Client(
@@ -13,6 +18,10 @@ client = Client(
 )
 OAUTH_TOKEN = "oauth_token"
 OAUTH_VERIFIER = "oauth_verifier"
+MODEL_FILE_NAME = "modelFileName"
+MODEL_FILE_PATH = "modelFilePath"
+
+
 
 # Shapeways API interactions
 
@@ -41,6 +50,20 @@ def api_callback():
     assert info['result'] == 'success', "API authentication failed"
     return redirect('http://localhost:5051/', 302)
 
-@shapeways_api.route('/upload')
+@shapeways_api.route('/upload', methods=['POST'])
 def api_upload():
-    pass
+    model_file = requests.get(request.form[MODEL_FILE_PATH])
+    file_data = base64.b64encode(model_file.content)
+    model_name = "Made By Charmer"
+    params = {
+        "fileName": model_name + '.x3db',
+        "file": file_data,
+        "hasRightsToModel": True,
+        "acceptTermsAndConditions": True
+    }
+    response = client.add_model(params=params)
+    return_params = {
+        "modelId": response['modelId'],
+        "title": model_name
+    }
+    return json.dumps(return_params)
