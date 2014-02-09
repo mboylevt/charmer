@@ -27,8 +27,6 @@ env.register('js_charmer', js_charmer)
 css_common = Bundle('css/style.css', output='gen/common.css')
 env.register('css_common', css_common)
 
-
-
 @app.route('/')
 def main_template():
     return render_template('selector/selector.html', widgets=[])
