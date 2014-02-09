@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import MySQLdb
-import os
 from flask import Flask, render_template
 from flask.ext.assets import Environment, Bundle
-from reflection import reflection
 
+from reflection import reflection
+from shapewaysapi import shapeways_api
+
+# Register flask application and blueprints, and retrieve environment
 app = Flask(__name__)
 app.register_blueprint(reflection)
+app.register_blueprint(shapeways_api)
+env = Environment(app)
 
 app.config.update(dict(
     # ASSETS_DEBUG=True
 ))
-
-env = Environment(app)
 
 # Register javascript
 js_common = Bundle('js/jquery/jquery.js', 'js/jquery/jquery-forms.js', output='gen/common.js')
