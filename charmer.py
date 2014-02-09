@@ -18,8 +18,8 @@ app.config.update(dict(
 
 # Register javascript
 js_common = Bundle('js/jquery/jquery.js', 'js/jquery/jquery-forms.js', output='gen/common.js')
-js_charmer = Bundle('js/charmer/charmer.js', 'js/charmer/sw.shapejs.creator-2.0.js',
-                    'js/charmer/example-app.js', output='gen/charmer.js')
+js_charmer = Bundle('js/charmer/shapejs-charmer.js', 'js/charmer/sw.shapejs.creator-2.0.js',
+                    'js/charmer/charmer.js', output='gen/charmer.js')
 env.register('js_common', js_common)
 env.register('js_charmer', js_charmer)
 

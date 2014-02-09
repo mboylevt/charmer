@@ -1,163 +1,32 @@
+var modelPath = null;
 
-// Tealight reflection using polyhedra reflection
-//
-// author Vladimir Bulatov
-// author Alan Hudson
-//
-var TAU = (Math.sqrt(5)+1)/2; // golden ratio
-var PI = Math.PI;
+/**
+ *  Success callback for the call to ShapeJS
+ */
+function onGenerateModelSuccess(aoptOutput, modelFilePath) {
+    // grab the iframe using the path to the aopt file
+    aoptOutput = 'https://images.shapeways.com/3dviewer/aopt-file?aoptFilePath=' + aoptOutput + "&width=500&height=300";
+    $("#x3d-iframe").attr('src', aoptOutput);
 
-// Returns plane via 3 points (v1, 0, v2)
-// external normal points in the direction from where points are ordered  counter clockwise
-function getPlane(v1,v2){
-     var n = new Vector3d();
-     n.cross(v2,v1);
-     n.normalize();
-     return ReflectionSymmetry.getPlane(n, 0);
+    // set the model path for uploading later
+    modelPath = modelFilePath;
 }
 
-function getIcosahedralSymmetry( ){
-    var v5 = new Vector3d(1,0,TAU); // vertex of icosahedron
-    var v3 = new Vector3d(0,1/TAU,TAU); // vertex of dodecahedron
-    var p35 = new Vector3d(); // normal to plane via (0, v3, v5)
-
-    p35.cross(v3, v5);
-    p35.normalize();
-
-    var splanes = new Array();
-    var count = 0;
-    splanes[count++] = new ReflectionSymmetry.getPlane(new Vector3d(-1,0,0), 0.);
-    splanes[count++] = new ReflectionSymmetry.getPlane(new Vector3d(0,-1,0), 0.);
-    splanes[count++] = new ReflectionSymmetry.getPlane(p35, 0.);
-
-    return new ReflectionSymmetry(splanes);
-}
-
-function getSphereBend(fixedRadius, bendAmount, offset){
-
-    var center = fixedRadius*fixedRadius/bendAmount;
-    var radius = Math.sqrt(center*center + fixedRadius*fixedRadius);
-
-    var cp = new CompositeTransform();
-    cp.add(new PlaneReflection(new Vector3d(0,0,1), new Vector3d(0,0,offset)));
-    cp.add(new SphereInversion(new Vector3d(0,0,-center + offset), radius));
-    return cp;
-}
-
-function getImage(radius, thickness, path){
-
-    var s = radius/Math.sqrt(1 + 1./(TAU*TAU));
-    var v5 = new Vector3d(s/TAU,0,s); // vertex of icosahedron
-    var v3 = new Vector3d(0,s/(TAU*TAU),s); // vertex of dodecahedron
-
-    var union = new Union();
-
-    var correction = 1.1; // correction to get
-    var ypnt = v3.y*correction;
-    var xpnt = v5.x;
-    var image = new ImageBitmap(path, xpnt, ypnt, thickness);
-    var vs = 0.1*MM;
-    image.setBaseThickness(0);
-    image.setVoxelSize(vs);
-    image.setUseGrayscale(false);
-    image.setBlurWidth(vs);
-    image.setTransform(new Translation(xpnt/2,ypnt/2,v5.z));
-
-    union.add(image);
-
-    union.setTransform(getSphereBend(v5.x, radius - v5.z, v5.z));
-
-    var dt = new DataTransformer();
-    dt.setSource(union);
-    return dt;
-}
-
-// Create a hole for the tea light to be placed through
-function getLightHole(hole,outside) {
-    var cyl = new Cylinder(new Vector3d(0,0,0), new Vector3d(0,-outside,0), hole);
-    return cyl;
-}
-
-// Create a rim around the light hole
-function getRim(loc,hole,radius,thickness) {
-    // Calculate intersection location of cylinder with sphere
-    var outer = new Cylinder(new Vector3d(0,loc,0), new Vector3d(0,loc-thickness,0), hole + thickness);
-    var inner = new Cylinder(new Vector3d(0,loc,0), new Vector3d(0,loc-thickness,0), hole);
-    var rim = new Subtraction(outer,inner);
-
-    return rim;
-}
-
-// Create a rim around the light hole
-function getRimOld(hole,radius,thickness) {
-    var cr = hole + thickness;
-
-    // Calculate intersection location of cylinder with sphere
-    var loc = -radius +(radius - Math.sqrt(radius * radius - cr * cr)) - thickness;
-    var outer = new Cylinder(new Vector3d(0,loc,0), new Vector3d(0,loc-thickness,0), hole + thickness);
-    var inner = new Cylinder(new Vector3d(0,loc,0), new Vector3d(0,loc-thickness,0), hole);
-    var rim = new Subtraction(outer,inner);
-
-    return rim;
-}
-// Create a rim around the light hole
-function getRimBottom(loc,hole,radius,thickness) {
-    var cr = hole + thickness;
-
-    // Calculate intersection location of cylinder with sphere
-    var outer = new Cylinder(new Vector3d(0,loc,0), new Vector3d(0,loc+thickness,0), hole + thickness);
-    var inner = new Cylinder(new Vector3d(0,loc,0), new Vector3d(0,loc+thickness,0), hole);
-    var rim = new Subtraction(outer,inner);
-
-    return rim;
-}
-
-
-function main(args){
-
-//    var radius = 5.5*MM;
-//    var thickness = 1.1*MM;
-//    var voxelSize = 0.05*MM;
-//    var holeRadius = 2.2*MM;  // a bit larger then a typical 1.5" / 38.1mm tea light
-//    var rimThickness = 1.0*MM;
-
-    var radius = args[1]*MM;
-    var thickness = args[0]*MM;
-    var voxelSize = 0.05*MM;
-    var holeRadius = 2.2*MM;  // a bit larger then a typical 1.5" / 38.1mm tea light
-    var rimThickness = MM;
-
-    var a = radius + 2*thickness;
-
-    var imagePath = args[2];
-    var image = getImage(radius, thickness, imagePath ,voxelSize);
-
-    var reflectedImage = new Union();
-
-    reflectedImage.add(image);
-    reflectedImage.setTransform(getIcosahedralSymmetry( ));
-
-    var subtractBottom = new Subtraction(reflectedImage, getLightHole(holeRadius,a));
-    var subtractTop = new Subtraction(subtractBottom, getLightHole(holeRadius,-a));
-
-    var rim = getRimOld(holeRadius,radius,rimThickness);
-    var cr = holeRadius + thickness;
-    var locTop = -radius +(radius - Math.sqrt(radius * radius - cr * cr)) - thickness;
-    var locBottom = -(-radius +(radius - Math.sqrt(radius * radius - cr * cr)) - thickness);
-
-    var rimTop = getRim(locTop,holeRadius,radius,rimThickness);
-    var rimBottom = getRimBottom(locBottom,holeRadius,radius,rimThickness);
-
-    var charm = new Union(subtractTop, rimTop);
-    charm.add(rimBottom);
-    var maker = new GridMaker();
-
-    maker.setSource(charm);
-    //	maker.setSource(new Union(rimTop,rimBottom));
-
-    var dest = createGrid(-a,a,-a,a,-a,a,voxelSize);
-
-    maker.makeGrid(dest);
-
-    return dest;
+/**
+ * Uploads a model with the Shapeways API.
+ */
+function uploadModel() {
+    console.log("They clicked upload");
+    var modelTitle = $('#title').val();
+    $.post('/upload',{
+        modelFilePath: modelPath, modelFileName: "ShapeJSDemoModel.x3db", title: modelTitle
+    }, function(response) {
+        // now that we have a model id, we can create a link to the model on shapeways
+        var decodedResponse = JSON.parse(response);
+        var modelId = decodedResponse.modelId;
+        var modelName = decodedResponse.title;
+        var modelLink = $('#model-link');
+        modelLink.html('<a href="https://www.shapeways.com/model/upload-and-buy/' + modelId + '" target="_blank">Check out ' + modelName + ' on shapeways.com!</a>');
+        modelLink.css('display', 'block');
+    });
 }

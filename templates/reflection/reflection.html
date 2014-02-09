@@ -13,9 +13,10 @@
       <label for="param2">Radius:</label>
         <input id="param2" name="param2" type="text" value="5.5"><br>
     </form>
+    <label>Charm Name:</label>
+      <input id="title" name="title" type="text" value="My Charm"><br>
     <button onclick="getShapeJsPreview(JSON.stringify($('#shapejs-script').val()), 'shapejs-demo-form', onGenerateModelSuccess)">Generate Model</button>
     <button onclick="uploadModel()">Upload Model</button><br>
-
   </div>
   <div id="model-link" style="display:none">
   </div>
@@ -26,9 +27,9 @@
 </div>
 
 <script>
-  // Load the default icosahedron reflection script
+  // Load the shapejs-charmer script
   $(document).ready(function() {
-    var filePath = "/static/js/charmer/charmer.js";
+    var filePath = "/static/js/charmer/shapejs-charmer.js";
     xmlhttp = new XMLHttpRequest();
     xmlhttp.open("GET",filePath,false);
     xmlhttp.send(null);
