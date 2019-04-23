@@ -5,5 +5,5 @@ Werkzeug==0.9.4
 Twisted-Core==11.1.0
 Twisted-Names==11.1.0
 Twisted-Web==11.1.0
-Jinja2==2.7.2
 shapeways==1.0.0
+Jinja2>=2.10.1
